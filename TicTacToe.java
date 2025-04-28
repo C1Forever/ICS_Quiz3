@@ -16,7 +16,7 @@ public class TicTacToe {
 
         // Read which mode to play with
         do {
-            System.out.println("Enter 1 for 2 players mode or enter 2 for playing against the CPU or enter 0 to quit.");
+            System.out.println("Enter 1 for 2-player mode / Enter 2 for CPU mode / Enter 0 to quit");
             mode = input.nextInt();
 
             switch (mode) {
@@ -49,7 +49,7 @@ public class TicTacToe {
                 displayBoard();
             }
 
-            System.out.print("Player " + currentPlayer + " turn: ");
+            System.out.print("Player " + currentPlayer + "'s turn: ");
             int position = input.nextInt();
 
             if (position == 0) {
@@ -71,7 +71,7 @@ public class TicTacToe {
                     return;
                 } else if (checkTie()) {
                     displayBoard();
-                    System.out.println("Game Over! It is a tie!");
+                    System.out.println("Game Over! It's a draw!");
                     return;
                 } else {
                     // switch player
