@@ -10,6 +10,9 @@ public class TicTacToe {
     private static int[] numError = {0, 0};                 //number of invalid inputs
     private static Scanner input = new Scanner(System.in);  
 
+    //cpu will not play selected positions (start from 1~9)
+    private static ArrayList<Integer> openPos = new ArrayList<>();
+
     public static void main(String[] args) {
         int mode = 0;
         boolean exitGame = false;
@@ -99,15 +102,15 @@ public class TicTacToe {
         //player 1 is you, player 2 is cpu
         int currentPlayer = 1;
 
-        //cpu will not play selected positions (start from 1~9)
-        ArrayList<Integer> openPos = new ArrayList<>();
+        //fill with 1~9
+        openPos.clear();
         for (int i = 1; i <= 9; i ++){
             openPos.add(i);
         }
 
         initBoard();
         boolean error = false;
-        int position;
+        int position = 0;
 
         while (true) {
 
@@ -128,42 +131,30 @@ public class TicTacToe {
 
             //cpu turn
             else {
-                boolean clearWin = false;
-
+                
+                boolean clearWin = findClearWin();
+                
                 //MAKE SURE IT DOESNT RANDOMIZE WHEN THERES A CLEAR WIN
                 if (clearWin){
-                    position = 0; //placeholder
+                    int numberWin = selectClearWin(2);
+                    int numberDef = selectClearWin(1);
+
+                    //if clear win, return clearWinPos
+                    if (numberWin != 0){
+                        position = numberWin;
+                    }
+
+                    //else if clear defense, return clearWinPos
+                    else if (numberDef != 0){
+                        position = numberDef;
+                    }
                 }
 
                 else {
-                    
-                    //random number 1~9, +1 to avoid cpu from choosing 0
-                    Random rand = new Random();
-                    int randPos = 0;
-                    boolean valid = false;
-
-                    //randomize until cpu chooses valid position
-                    while (!valid){
-                        randPos = rand.nextInt(9) + 1;
-
-                        //go throught cpu's available moves
-                        for (int i = 0; i < openPos.size(); i ++){
-
-                            //choose this available space and remove it
-                            if (openPos.get(i) == randPos){
-                                openPos.remove(i);
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    position = randPos;
-                    //System.out.println("cpu picked " + position);
+                    position = selectRandomPos();
                 }
             }
             
-
             //process input
             if (position == 0) {
                 System.out.println("Player 1 forfeits the game.");
@@ -179,7 +170,7 @@ public class TicTacToe {
                 //this position is selected, remove it from cpu's option
                 openPos.remove(Integer.valueOf(position));
 
-                // Check if the game ends
+                //check for ends
                 if (checkWin(currentPlayer)) {
                     displayBoard();
                     
@@ -199,8 +190,9 @@ public class TicTacToe {
                     return;
                 }
                 
+                //if game doesnt end
                 else {
-                    // switch player
+                    //switch player
                     currentPlayer = (currentPlayer == 1 ? 2 : 1);
                 }
             }
@@ -286,6 +278,147 @@ public class TicTacToe {
             }
         }
         return true;
+    }
+
+    //cpu finds a clear win / clear defense
+    public static boolean findClearWin(){
+
+        boolean found = false;
+        int numberWin = selectClearWin(2);
+        int numberDef = selectClearWin(1);
+
+        //if clear win, return clearWinPos
+        if (numberWin != 0){
+            found = true;
+        }
+
+        //else if clear defense, return clearWinPos
+        else if (numberDef != 0){
+            found = true;
+        }
+
+        else {
+            found = false;
+        }
+
+        return found;
+    }
+
+    public static int selectRandomPos(){
+        //random number 1~9, +1 to avoid cpu from choosing 0
+        Random rand = new Random();
+        int randPos = 0;
+        boolean valid = false;
+
+        //randomize until cpu chooses valid position
+        while (!valid){
+            randPos = rand.nextInt(9) + 1;
+
+            //go throught cpu's available moves
+            for (int i = 0; i < openPos.size(); i ++){
+
+                //choose this available space and remove it
+                if (openPos.get(i) == randPos){
+                    openPos.remove(i);
+                    valid = true;
+                    break;
+                }
+            }
+        }
+        return randPos;
+    }
+
+    public static int selectClearWin(int forWho){
+        
+        int clearWinPos = 0;
+
+        //check for row wins
+        for (int i = 0; i < 3; i++) {
+            if (board[i][1] == forWho && board[i][2] == forWho) { 
+                //first column (1, 4, 7)
+                if (openPos.contains(Integer.valueOf((3 * i) + 1))){
+                    clearWinPos = (3 * i) + 1;
+                    break;
+                }
+            }
+            else if (board[i][0] == forWho && board[i][2] == forWho) {
+                //second column (2, 5, 8)
+                if (openPos.contains(Integer.valueOf((3 * i) + 2))){
+                    clearWinPos = (3 * i) + 2;
+                    break;
+                }
+            }
+            else if (board[i][0] == forWho && board[i][1] == forWho) {
+                //third column (3, 6, 9)
+                if (openPos.contains(Integer.valueOf((3 * i) + 3))){
+                    clearWinPos = (3 * i) + 3;
+                    break;
+                }
+            }
+        }
+        
+        //check for column wins
+        for (int i = 0; i < 3; i++) {
+            if (board[1][i] == forWho && board[2][i] == forWho) {
+                //first row (1, 2, 3)
+                if (openPos.contains(Integer.valueOf(i + 1))){
+                    clearWinPos = i + 1;
+                    break;
+                }
+            }
+
+            if (board[0][i] == forWho && board[2][i] == forWho) {
+                //second row (4, 5, 6)
+                if (openPos.contains(Integer.valueOf(i + 4))){
+                    clearWinPos = i + 4;
+                    break;
+                }
+            }
+
+            if (board[0][i] == forWho && board[1][i] == forWho) {
+                //third row (7, 8, 9)
+                if (openPos.contains(Integer.valueOf(i + 7))){
+                    clearWinPos = i + 7;
+                    break;
+                }
+            }
+        }
+
+        //find diagonal wins
+        for (int i = 0; i < 3; i++) {
+            if (board[1][1] == forWho && board[i][2] == forWho) {
+                //first row and col (1, 7)
+                //if i = 0 pos = 7
+                //if i = 1 pos = 4
+                //if i = 2 pos = 1
+                // 7 - (3 * i)
+                if (openPos.contains(Integer.valueOf(7 - (3 * i)))){
+                    clearWinPos = 7 - (3 * i);
+                    break;
+                }
+            }
+            else if ((board[0][0] == forWho && board[2][2] == forWho) 
+            || (board[0][2] == forWho && board[2][0] == forWho)) {
+                //second row and col (5)
+                if (openPos.contains(Integer.valueOf(5))){
+                    clearWinPos = 5;
+                    break;
+                }
+            }
+            else if (board[1][1] == forWho && board[i][0] == forWho) {
+                //third row and col (3, 9)
+                //if i = 0 pos = 9
+                //if i = 1 pos = 6
+                //if i = 2 pos = 3
+                // 9 - (3 * i)
+                if (openPos.contains(Integer.valueOf(9 - (3 * i)))){
+                    clearWinPos = 9 - (3 * i);
+                    break;
+                }
+            }
+        }
+
+        return clearWinPos;
     }
 
     public static void initBoard() {
