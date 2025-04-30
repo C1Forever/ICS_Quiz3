@@ -6,11 +6,11 @@ public class TicTacToe {
     // 2 -> occupied by player2
     // 0 -> unoccupied
     private static int[][] board = new int[3][3];
-    private static int consecutiveError = 0;                //number of same inputs
-    private static int[] numError = {0, 0};                 //number of invalid inputs
+    private static int consecutiveError = 0;                // number of consecutive invalid inputs
+    private static int[] numError = {0, 0};                 // number of invalid inputs
     private static Scanner input = new Scanner(System.in);  
 
-    //cpu will not play selected positions (start from 1~9)
+    // cpu will not play selected positions (start from 1~9)
     private static ArrayList<Integer> openPos = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -28,7 +28,6 @@ public class TicTacToe {
                     break;
                 case 2:
                     againstCPU();
-                    //System.out.println("Implementing...");
                     break;
                 case 0:
                     System.out.println("Thanks for playing!");
@@ -114,7 +113,7 @@ public class TicTacToe {
 
         while (true) {
 
-            //continue game if theres no error
+            //display the board if theres no error
             if (!error) {
                 
                 //display board once
@@ -208,7 +207,6 @@ public class TicTacToe {
                 // 'and' OR 'or'???
                 if (consecutiveError >= 3 || numError[currentPlayer-1] >= 5) {
                     System.out.println("Player " + currentPlayer + " forfeit the game due to reaching maximum incorrect entries.");
-                    int winner = (currentPlayer == 1 ? 2 : 1);
 
                     //this will always display "CPU wins" but its here
                     //just in case the CPU bugs and chooses invalid positions
